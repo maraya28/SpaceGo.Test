@@ -8,7 +8,7 @@ Content-Type: application/json
 Authorization: Bearer {{AccessToken}}
 
 {
-   "bet": 100
+   "bet": 50
 }
 
 ###

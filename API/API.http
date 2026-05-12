@@ -1,0 +1,14 @@
+@API_HostAddress = https://localhost:7246
+@AccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6IjYwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6ImFkbWluIiwibmJmIjoxNzc4NTE3ODE5LCJleHAiOjE3Nzg1MjE0MTksImlhdCI6MTc3ODUxNzgxOX0.Q3EpR4kewMKSzowRb0ywLsmB7CdDceFQpBRIOu-fb7o
+
+###
+
+POST {{API_HostAddress}}/api/slot/spin
+Content-Type: application/json
+Authorization: Bearer {{AccessToken}}
+
+{
+   "bet": 100
+}
+
+###

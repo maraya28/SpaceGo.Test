@@ -1,5 +1,6 @@
 ﻿
 using Application.Contracts;
+using Domain;
 using static Domain.SlotDefinition;
 
 namespace Application.Implementations
@@ -12,23 +13,30 @@ namespace Application.Implementations
 
             ValidateBalance(bet, balance);
 
+            ValidateBet(bet);
+
             var c = await walletService.Debit(playerId, bet);
 
-            var strip1 = Spin(Reel0Strip);
-            var strip2 = Spin(Reel1Strip);
-            var strip3 = Spin(Reel2Strip);
-            var strip4 = Spin(Reel3Strip);
+            var (strip1, lastStop1) = SpinAndLastStop(Reel0Strip);
+            var (strip2, lastStop2) = SpinAndLastStop(Reel1Strip);
+            var (strip3, lastStop3) = SpinAndLastStop(Reel2Strip);
+            var (strip4, lastStop4) = SpinAndLastStop(Reel3Strip);
+
+
+            var slot = new Slot() { PlayerId = playerId, LastStop = [lastStop1, lastStop2, lastStop3, lastStop4] };
 
             var response = new BetResponse()
             {
-                Symbols = new[] { strip1, strip1, strip3, strip4 },
+                Symbols = [strip1, strip1, strip3, strip4],
             };
             return await Task.FromResult(response);
         }
 
 
 
-        private static Symbol[] Spin(Symbol[] reel)
+
+
+        private static (Symbol[], int) SpinAndLastStop(Symbol[] reel)
         {
             var length = reel.Length;
             var startIndex = new Random().Next(0, length);
@@ -43,8 +51,11 @@ namespace Application.Implementations
                 symbols[i] = symbol;
             }
 
-            return symbols;
+            return (symbols, startIndex);
         }
+
+
+
 
         private void ValidateBalance(int bet, long balance)
         {
@@ -53,5 +64,19 @@ namespace Application.Implementations
                 throw new ApplicationException("You do not have sufficient funds to place this bet.");
             }
         }
+
+
+        private void ValidateBet(int bet)
+        {
+            if (!AvailableBets.Contains(bet))
+            {
+                throw new ApplicationException("The selected bet is not avaibled.");
+            }
+        }
+
+        // TODO REFACTOR LIST of SPINS
+
+
+
     }
 }

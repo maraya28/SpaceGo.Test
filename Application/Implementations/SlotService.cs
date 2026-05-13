@@ -15,27 +15,42 @@ namespace Application.Implementations
 
             ValidateBet(bet);
 
-            var c = await walletService.Debit(playerId, bet);
+            var debit = await walletService.Debit(playerId, bet);
 
-            var (strip1, lastStop1) = SpinAndLastStop(Reel0Strip);
-            var (strip2, lastStop2) = SpinAndLastStop(Reel1Strip);
-            var (strip3, lastStop3) = SpinAndLastStop(Reel2Strip);
-            var (strip4, lastStop4) = SpinAndLastStop(Reel3Strip);
+            var (reel1, lastStop1) = SpinAndLastStop(Reel0Strip);
+            var (reel2, lastStop2) = SpinAndLastStop(Reel1Strip);
+            var (reel3, lastStop3) = SpinAndLastStop(Reel2Strip);
+            var (reel4, lastStop4) = SpinAndLastStop(Reel3Strip);
+            var (reel5, lastStop5) = SpinAndLastStop(Reel4Strip);
 
+            Symbol[][] grid = [reel1, reel2, reel3, reel4, reel5];
 
-            var slot = new Slot() { PlayerId = playerId, LastStop = [lastStop1, lastStop2, lastStop3, lastStop4] };
+            var slot = new Slot() { PlayerId = playerId, LastStop = [lastStop1, lastStop2, lastStop3, lastStop4, lastStop5] };
+
+            var (totalPayout, prizes) = Calculate(grid, bet);
+
+            await walletService.Credit(playerId, totalPayout);
 
             var response = new BetResponse()
             {
-                Symbols = [strip1, strip1, strip3, strip4],
+                Symbols = grid,
+                Prizes = prizes.ToArray(),
+                TotalPayout = totalPayout,
             };
             return await Task.FromResult(response);
         }
 
+        public static (int total, List<Prize> prizes) Calculate(Symbol[][] grid, int bet)
+        {
+            int total = 0;
+            var prizes = new List<Prize>();
 
+            return (total, prizes); 
+        }
 
-
-
+        /// <summary>
+        /// Spin and return the last Stop
+        /// </summary>
         private static (Symbol[], int) SpinAndLastStop(Symbol[] reel)
         {
             var length = reel.Length;
@@ -54,9 +69,6 @@ namespace Application.Implementations
             return (symbols, startIndex);
         }
 
-
-
-
         private void ValidateBalance(int bet, long balance)
         {
             if (bet > balance)
@@ -64,7 +76,6 @@ namespace Application.Implementations
                 throw new ApplicationException("You do not have sufficient funds to place this bet.");
             }
         }
-
 
         private void ValidateBet(int bet)
         {
@@ -75,8 +86,5 @@ namespace Application.Implementations
         }
 
         // TODO REFACTOR LIST of SPINS
-
-
-
     }
 }

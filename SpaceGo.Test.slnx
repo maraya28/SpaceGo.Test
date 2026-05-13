@@ -2,5 +2,6 @@
   <Project Path="API/API.csproj" />
   <Project Path="Application/Application.csproj" />
   <Project Path="Domain/Domain.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" Id="24385eb6-ca0d-4379-8bf7-9121083846d0" />
   <Project Path="TokenGenerator/TokenGeneratorConsole.csproj" />
 </Solution>

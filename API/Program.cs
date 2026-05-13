@@ -3,7 +3,11 @@ using API.Middlewares;
 using Application;
 using Application.Contracts;
 using Application.Implementations;
+using Infrastructure.Contracts;
+using Infrastructure.Implementations;
+using Infrastructure.Persistance;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -43,6 +47,9 @@ builder.Services.AddSwaggerGen(); //
 builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<IWallet, WalletService>();
 
+builder.Services.AddDbContext<SpaceGoDbContext>(dbContext => dbContext.UseInMemoryDatabase("SpaceGo"));
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -63,6 +70,13 @@ app.UseAuthorization();
 app.UseMiddleware<ValidationMiddleware>();
 
 app.UseExceptionHandler();
+
+
+await using (var serviceScope = app.Services.CreateAsyncScope())
+await using (var dbcontext = serviceScope.ServiceProvider.GetRequiredService<SpaceGoDbContext>())
+{
+    await dbcontext.Database.EnsureCreatedAsync();
+}
 
 app.MapControllers();
 

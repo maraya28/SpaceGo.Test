@@ -12,13 +12,12 @@ namespace TokenGenerator
             var secretKey = "THIS_IS_MY_SUPER_SECRET_KEY_12345";
             var key = Encoding.UTF8.GetBytes(secretKey);
 
-            Random rnd = new Random();
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
     {
-                    new Claim("playerId", rnd.Next(1,100).ToString()),
+                    new Claim("playerId", "9003"),
                     new Claim("name", "John Doe"),
                     new Claim("role", "admin"),
                 }),

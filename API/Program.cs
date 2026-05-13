@@ -20,6 +20,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
+
 var settings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -58,6 +61,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<ValidationMiddleware>();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 

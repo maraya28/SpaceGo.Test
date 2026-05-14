@@ -18,16 +18,19 @@ namespace Application.Implementations
 
             var debit = await walletService.Debit(playerId, bet);
 
-            var (reel1, lastStop1) = SpinAndLastStop(Reel0Strip);
-            var (reel2, lastStop2) = SpinAndLastStop(Reel1Strip);
-            var (reel3, lastStop3) = SpinAndLastStop(Reel2Strip);
-            var (reel4, lastStop4) = SpinAndLastStop(Reel3Strip);
-            var (reel5, lastStop5) = SpinAndLastStop(Reel4Strip);
+            var strips = new List<Symbol[]>() { Reel0Strip, Reel1Strip, Reel2Strip, Reel3Strip, Reel4Strip };
+            List<(Symbol[] symbols, int lastStop)> reelsLastStop = [];
 
-            Symbol[][] grid = [reel1, reel2, reel3, reel4, reel5];
+            foreach (var strip in strips)
+            {
+                var (reel, lastStop) = GetReelAndLastStop(strip);
+                reelsLastStop.Add((reel, lastStop));
+            }
+
+            Symbol[][] grid = reelsLastStop.Select(_ => _.symbols).ToArray();
 
             var slot = await slotStore.Get();
-            slot.LastStop = [lastStop1, lastStop2, lastStop3, lastStop4, lastStop5];
+            slot.LastStop = reelsLastStop.Select(_ => _.lastStop).ToArray();
 
             var (totalPayout, prizes) = Calculate(grid, bet);
 
@@ -49,24 +52,24 @@ namespace Application.Implementations
             int total = 0;
             var prizes = new List<Prize>();
 
-            return (total, prizes); 
+            return (total, prizes);
         }
 
         /// <summary>
-        /// Spin and return the last Stop
+        /// Return Reel and LastStop from Strip
         /// </summary>
-        private static (Symbol[], int) SpinAndLastStop(Symbol[] reel)
+        private static (Symbol[], int) GetReelAndLastStop(Symbol[] strip)
         {
-            var length = reel.Length;
+            var length = strip.Length;
             var startIndex = new Random().Next(0, length);
 
-            // Pick next 4 Symbols to Display
+            // Pick next 4 Symbols to display
             Symbol[] symbols = new Symbol[4];
 
             for (int i = 0; i < 4; i++)
             {
-                var index = (startIndex + i) % reel.Length;
-                var symbol = reel[index];
+                var index = (startIndex + i) % strip.Length;
+                var symbol = strip[index];
                 symbols[i] = symbol;
             }
 
@@ -88,7 +91,5 @@ namespace Application.Implementations
                 throw new ApplicationException("The selected bet is not avaibled.");
             }
         }
-
-        // TODO REFACTOR LIST of SPINS
     }
 }

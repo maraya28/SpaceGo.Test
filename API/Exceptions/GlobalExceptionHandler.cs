@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Middlewares
+namespace API.Exceptions
 {
-    public class ExceptionHandlingMiddleware : IExceptionHandler
+    public class GlobalExceptionHandler : IExceptionHandler
     {
         // TODO : Add logs
 

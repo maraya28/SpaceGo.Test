@@ -1,15 +1,10 @@
 using API.Configuration;
+using API.Exceptions;
+using API.Extensions;
 using API.Middlewares;
-using Application;
-using Application.Contracts;
-using Application.Implementations;
-using Infrastructure.Contracts;
-using Infrastructure.Implementations;
+using Application.Extensions;
+using Infrastructure.Extensions;
 using Infrastructure.Persistance;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using System.Text.Json.Serialization;
 using static Domain.SlotDefinition;
 
@@ -25,30 +20,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddOpenApi();
 
 builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var settings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings!.SecretKey))
-        };
-    });
+builder.Services.AddAuthorizationSetup(settings!);
 
 builder.Services.AddEndpointsApiExplorer(); //
 builder.Services.AddSwaggerGen(); //
 
-builder.Services.AddScoped<ISlotService, SlotService>();
-builder.Services.AddScoped<IWallet, WalletService>();
-
-builder.Services.AddDbContext<SpaceGoDbContext>(dbContext => dbContext.UseInMemoryDatabase("SpaceGo"));
-builder.Services.AddScoped<IWalletStore, WalletStore>();
+builder.Services.AddAplicationSetup();
+builder.Services.AddInfrastructureSetup();
 
 builder.Services.AddAuthorization();
 

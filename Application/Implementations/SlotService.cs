@@ -1,11 +1,12 @@
 ﻿
 using Application.Contracts;
 using Domain;
+using Infrastructure.Contracts;
 using static Domain.SlotDefinition;
 
 namespace Application.Implementations
 {
-    public class SlotService(IWallet walletService) : ISlotService
+    public class SlotService(IWallet walletService, ISlotStore slotStore) : ISlotService
     {
         public async Task<BetResponse> Spin(string playerId, int bet)
         {
@@ -25,11 +26,14 @@ namespace Application.Implementations
 
             Symbol[][] grid = [reel1, reel2, reel3, reel4, reel5];
 
-            var slot = new Slot() { PlayerId = playerId, LastStop = [lastStop1, lastStop2, lastStop3, lastStop4, lastStop5] };
+            var slot = await slotStore.Get();
+            slot.LastStop = [lastStop1, lastStop2, lastStop3, lastStop4, lastStop5];
 
             var (totalPayout, prizes) = Calculate(grid, bet);
 
             await walletService.Credit(playerId, totalPayout);
+
+            await slotStore.Set(slot);
 
             var response = new BetResponse()
             {

@@ -12,6 +12,7 @@ namespace Infrastructure.Extensions
         {
             services.AddDbContext<SpaceGoDbContext>(dbContext => dbContext.UseInMemoryDatabase("SpaceGo"));
             services.AddScoped<IWalletStore, WalletStore>();
+            services.AddScoped<ISlotStore, SlotStore>();
             return services;
         }
     }

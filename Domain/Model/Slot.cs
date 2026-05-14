@@ -4,12 +4,13 @@ using System.Text;
 
 namespace Domain
 {
-
     /// <summary>
     /// Represents a slot machine for a specific player.
     /// </summary>
     public class Slot
     {
+        public Guid Id { get; set; }
+
         /// <summary>
         /// The unique identifier of the player associated with this slot.
         /// </summary>

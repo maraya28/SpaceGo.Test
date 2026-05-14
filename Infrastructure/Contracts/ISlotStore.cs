@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Application
+namespace Infrastructure.Contracts
 {
     /// <summary>
     /// Abstraction for reading and updating the persistent slot state.

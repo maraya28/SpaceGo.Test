@@ -2,13 +2,13 @@
 
 namespace Application.Implementations
 {
-    public class WalletService(IWalletRepository repository) : IWallet
+    public class WalletService(IWalletStore repository) : IWallet
     {
         public long Balance { get; private set; }
           
         public async Task<long> Credit(string playerId, long amount)
         {
-            Balance = Balance + amount;
+            Balance =+ amount;
             return await Task.FromResult(Balance);
         }
 

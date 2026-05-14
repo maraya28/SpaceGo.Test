@@ -20,7 +20,6 @@
             P3,
         }
 
-
         /// <summary>
         /// Defines all available betting values.
         /// </summary>
@@ -400,7 +399,6 @@
             Symbol.P3,
         ];
 
-
         /// <summary>
         /// List of all paylines evaluated by the slot machine.
         /// Each line is represented as an ordered set of grid positions.
@@ -418,7 +416,6 @@
             new Line(8, [.. new[] { 3, 2, 1, 0, 0 }.Select((x, i) => new GridPosition(i, x))]),
             new Line(9, [.. new[] { 0, 1, 2, 3, 3 }.Select((x, i) => new GridPosition(i, x))]),
         ];
-
 
         /// <summary>
         /// Paytable indexed by symbol,

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Implementations
 {
-    public class WalletRepository(SpaceGoDbContext dbContext) : IWalletRepository
+    public class WalletStore(SpaceGoDbContext dbContext) : IWalletStore
     {
         public async Task<Wallet> GetWallet(string playerId)
         {

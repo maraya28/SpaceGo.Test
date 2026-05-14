@@ -48,7 +48,7 @@ builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<IWallet, WalletService>();
 
 builder.Services.AddDbContext<SpaceGoDbContext>(dbContext => dbContext.UseInMemoryDatabase("SpaceGo"));
-builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<IWalletStore, WalletStore>();
 
 builder.Services.AddAuthorization();
 
@@ -70,7 +70,6 @@ app.UseAuthorization();
 app.UseMiddleware<ValidationMiddleware>();
 
 app.UseExceptionHandler();
-
 
 await using (var serviceScope = app.Services.CreateAsyncScope())
 await using (var dbcontext = serviceScope.ServiceProvider.GetRequiredService<SpaceGoDbContext>())

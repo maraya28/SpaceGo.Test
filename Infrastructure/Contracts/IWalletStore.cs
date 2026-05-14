@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Contracts
 {
-    public interface IWalletRepository
+    public interface IWalletStore
     {
         public Task<Wallet> GetWallet(string playerId);
 

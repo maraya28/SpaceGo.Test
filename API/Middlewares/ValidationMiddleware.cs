@@ -1,7 +1,7 @@
 ﻿using Application;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace API.Middlewares
+namespace API
 {
     public class ValidationMiddleware(RequestDelegate next)
     {

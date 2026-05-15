@@ -1,4 +1,6 @@
-﻿namespace Domain
+﻿using Domain;
+
+namespace Infrastructure
 {
     /// <summary>
     /// Represents a slot machine for a specific player.

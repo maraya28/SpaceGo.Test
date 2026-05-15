@@ -1,10 +1,9 @@
 ﻿using Infrastructure.Contracts;
 using Infrastructure.Implementations;
-using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Extensions
+namespace Infrastructure
 {
     public static class ServiceCollectionExtensions
     {

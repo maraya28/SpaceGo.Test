@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Exceptions
+namespace API
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {
-        // TODO : Add logs
-
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
             if (exception is ApplicationException appEx)

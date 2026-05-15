@@ -1,6 +1,4 @@
-﻿using Domain;
-using Infrastructure.Contracts;
-using Infrastructure.Persistance;
+﻿using Infrastructure.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Implementations

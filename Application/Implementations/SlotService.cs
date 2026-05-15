@@ -12,10 +12,10 @@ namespace Application.Implementations
         {
             var balance = await walletService.GetBalance(playerId);
 
-            ValidateBalance(bet, balance);
-
             ValidateBet(bet);
 
+            ValidateBalance(bet, balance);
+        
             var debit = await walletService.Debit(playerId, bet);
 
             var strips = new List<Symbol[]>() { Reel0Strip, Reel1Strip, Reel2Strip, Reel3Strip, Reel4Strip };
@@ -76,19 +76,19 @@ namespace Application.Implementations
             return (symbols, startIndex);
         }
 
-        private void ValidateBalance(int bet, long balance)
+        private static void ValidateBet(int bet)
+        {
+            if (!AvailableBets.Contains(bet))
+            {
+                throw new ApplicationException("The selected bet is not avaibled. The available bets are: 1, 2, 5, 10, 15, 20, 50.");
+            }
+        }
+
+        private static void ValidateBalance(int bet, long balance)
         {
             if (bet > balance)
             {
                 throw new ApplicationException("You do not have sufficient funds to place this bet.");
-            }
-        }
-
-        private void ValidateBet(int bet)
-        {
-            if (!AvailableBets.Contains(bet))
-            {
-                throw new ApplicationException("The selected bet is not avaibled.");
             }
         }
     }

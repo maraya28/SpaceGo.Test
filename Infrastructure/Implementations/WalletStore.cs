@@ -1,5 +1,4 @@
 ﻿using Infrastructure.Contracts;
-using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Implementations

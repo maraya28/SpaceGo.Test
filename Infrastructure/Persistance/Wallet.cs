@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Persistance
+﻿namespace Infrastructure
 {
     public class Wallet
     {

@@ -2,7 +2,7 @@
 using Application.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.Extensions
+namespace Application
 {
     public static class ServiceCollectionExtensions
     {

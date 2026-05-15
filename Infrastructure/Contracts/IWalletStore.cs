@@ -1,6 +1,4 @@
-﻿using Infrastructure.Persistance;
-
-namespace Infrastructure.Contracts
+﻿namespace Infrastructure.Contracts
 {
     public interface IWalletStore
     {

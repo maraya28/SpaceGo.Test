@@ -1,9 +1,8 @@
-﻿using API.Configuration;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace API.Extensions
+namespace API
 {
     public static class ServiceCollectionExtensions
     {

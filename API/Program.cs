@@ -1,10 +1,6 @@
-using API.Configuration;
-using API.Exceptions;
-using API.Extensions;
-using API.Middlewares;
-using Application.Extensions;
-using Infrastructure.Extensions;
-using Infrastructure.Persistance;
+using API;
+using Application;
+using Infrastructure;
 using System.Text.Json.Serialization;
 using static Domain.SlotDefinition;
 
@@ -25,9 +21,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 var settings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 builder.Services.AddAuthorizationSetup(settings!);
 
-builder.Services.AddEndpointsApiExplorer(); //
-builder.Services.AddSwaggerGen(); //
-
 builder.Services.AddAplicationSetup();
 builder.Services.AddInfrastructureSetup();
 
@@ -38,9 +31,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
@@ -59,5 +50,4 @@ await using (var dbcontext = serviceScope.ServiceProvider.GetRequiredService<Spa
 }
 
 app.MapControllers();
-
 app.Run();

@@ -17,6 +17,9 @@ namespace Application.Implementations
 
             ValidateBalance(bet, balance);
 
+            logger.LogInformation("Spin starting..");
+            logger.LogInformation("playerId={playerId} initialBalance={balance} bet={bet}", playerId, balance, bet);
+
             var debit = await walletService.Debit(playerId, bet);
 
             var strips = new List<Symbol[]>() { Reel0Strip, Reel1Strip, Reel2Strip, Reel3Strip, Reel4Strip };
@@ -33,11 +36,14 @@ namespace Application.Implementations
             var slot = await slotStore.Get();
             slot.LastStop = reelsLastStop.Select(_ => _.lastStop).ToArray();
 
-            var (prizes, totalPayout) = GetPrizesAndPayout(grid, bet);
+            var (prizes, totalPayout) = GetPrizesAndTotalPayout(grid, bet);
 
-            await walletService.Credit(playerId, totalPayout);
+            balance = await walletService.Credit(playerId, totalPayout);
 
             await slotStore.Set(slot);
+
+            logger.LogInformation("Spin stoping.");
+            logger.LogInformation("playerId={playerId} totalPayout={totalPayout} currentBalance={balance}", playerId, totalPayout, balance);
 
             var response = new BetResponse()
             {
@@ -49,9 +55,9 @@ namespace Application.Implementations
         }
 
         /// <summary>
-        /// Return Prizes and Payout
+        /// Return Prizes and total Payout
         /// </summary>
-        public (List<Prize> prizes, int total) GetPrizesAndPayout(Symbol[][] grid, int bet)
+        public (List<Prize> prizes, int total) GetPrizesAndTotalPayout(Symbol[][] grid, int bet)
         {
             int totalPayout = 0;
             var prizes = new List<Prize>();
@@ -60,8 +66,16 @@ namespace Application.Implementations
             foreach (var line in Lines)
             {
                 var payline = GetPayline(line, grid, paylineIndex);
-                var matchs = GetCountMatchesPerPayline(payline, paylineIndex);
-              
+                var (symbol, matches) = GetMatchesPerPayline(payline, paylineIndex);
+                var multiplier = GetMultiplier(symbol, matches);
+                var hasWinningLine = multiplier > 0;
+                if (hasWinningLine)
+                {
+                    (Prize prize, int payout) = GetPrizeAndPayout(line, matches, bet, multiplier);
+                    prizes.Add(prize);
+                    totalPayout += payout;
+                }
+
                 paylineIndex++;
             }
 
@@ -69,36 +83,54 @@ namespace Application.Implementations
         }
 
         /// <summary>
-        /// Returns first symbol count matches per payline
+        /// Returns Prize and Payout per winning Line
         /// </summary>
-        private int GetCountMatchesPerPayline(Symbol[] payline, int paylineIndex)
+
+        private (Prize prize, int payout) GetPrizeAndPayout(Line line, int matches, int bet, int multiplier)
+        {
+            var payout = bet * multiplier;
+            var prize = new Prize(line, matches, payout);
+            return (prize, payout);
+        }
+
+        /// <summary>
+        /// Returns Symbol multiplier from Paytable
+        /// </summary>
+        private int GetMultiplier(Symbol symbol, int matches)
+        {
+            var multiplier = Paytable[symbol][matches];
+            logger.LogInformation("Symbol='{symbol}' matches={matches} multiplier={multiplier}", symbol, matches, multiplier);
+            return multiplier;
+        }
+
+        /// <summary>
+        /// Returns first symbol consecutives matches per payline
+        /// </summary>
+        private (Symbol symbol, int matchs) GetMatchesPerPayline(Symbol[] payline, int paylineIndex)
         {
             Symbol symbolToMatch = payline[0];
-            var matchs = 1; // the first symbol counts as 1
+            var matches = 0;
 
-            for (int i = 1; i < payline.Length; i++) // start from the line 1. Line 0 counts as 1
+            for (int i = 1; i < payline.Length; i++) // start checking from the line 1. line 0 containts symbol to match
             {
                 if (payline[i] == symbolToMatch)
-                    matchs++;
+                    matches++;
                 else
                     break;
             }
-
-            logger.LogInformation("Symbol: '{symbolToMatch}' from Payline {paylineIndex} has {matchs} match/s", symbolToMatch, paylineIndex, matchs);
-            return matchs;
+            return (symbolToMatch, matches);
         }
-
 
         /// <summary>
         /// Returns symbols according to the defined paylines
         /// </summary>
-        private Symbol[] GetPayline(Line line, Symbol[][] grid, int payline) 
+        private Symbol[] GetPayline(Line line, Symbol[][] grid, int payline)
         {
             var symbols = line.GridPositions
                           .Select(p => grid[p.Reel][p.Row])
                           .ToArray();
 
-            logger.LogInformation("[PayLine {payline}-9]: {symbols[0]}, {symbols[1]}, {symbols[2]}, {symbols[3]}, {symbols[4]}", payline, symbols[0], symbols[1], symbols[2], symbols[3], symbols[4]);
+            logger.LogInformation("payLine={payline}-9 [{symbols[0]}, {symbols[1]}, {symbols[2]}, {symbols[3]}, {symbols[4]}]", payline, symbols[0], symbols[1], symbols[2], symbols[3], symbols[4]);
             return symbols;
 
         }

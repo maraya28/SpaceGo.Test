@@ -60,15 +60,34 @@ namespace Application.Implementations
             foreach (var line in Lines)
             {
                 var payline = GetPayline(line, grid, paylineIndex);
-                
-                Symbol firstSymbolToMatch = payline[0];
-                logger.LogInformation("Checking first Symbol: {symbol} from Payline {paylineIndex} to match..", firstSymbolToMatch, paylineIndex);
-          
+                var matchs = GetCountMatchesPerPayline(payline, paylineIndex);
+              
                 paylineIndex++;
             }
 
             return (prizes, totalPayout);
         }
+
+        /// <summary>
+        /// Returns first symbol count matches per payline
+        /// </summary>
+        private int GetCountMatchesPerPayline(Symbol[] payline, int paylineIndex)
+        {
+            Symbol symbolToMatch = payline[0];
+            var matchs = 1; // the first symbol counts as 1
+
+            for (int i = 1; i < payline.Length; i++) // start from the line 1. Line 0 counts as 1
+            {
+                if (payline[i] == symbolToMatch)
+                    matchs++;
+                else
+                    break;
+            }
+
+            logger.LogInformation("Symbol: '{symbolToMatch}' from Payline {paylineIndex} has {matchs} match/s", symbolToMatch, paylineIndex, matchs);
+            return matchs;
+        }
+
 
         /// <summary>
         /// Returns symbols according to the defined paylines
@@ -92,7 +111,7 @@ namespace Application.Implementations
             var length = strip.Length;
             var startIndex = new Random().Next(0, length);
 
-            // Pick next 4 Symbols to display
+            // pick next 4 Symbols to display
             Symbol[] symbols = new Symbol[4];
 
             for (int i = 0; i < 4; i++)

@@ -2,11 +2,12 @@
 using Application.Contracts;
 using Domain;
 using Infrastructure.Contracts;
+using Microsoft.Extensions.Logging;
 using static Domain.SlotDefinition;
 
 namespace Application.Implementations
 {
-    public class SlotService(IWallet walletService, ISlotStore slotStore) : ISlotService
+    public class SlotService(IWallet walletService, ISlotStore slotStore, ILogger<SlotService> logger) : ISlotService
     {
         public async Task<BetResponse> Spin(string playerId, int bet)
         {
@@ -15,7 +16,7 @@ namespace Application.Implementations
             ValidateBet(bet);
 
             ValidateBalance(bet, balance);
-        
+
             var debit = await walletService.Debit(playerId, bet);
 
             var strips = new List<Symbol[]>() { Reel0Strip, Reel1Strip, Reel2Strip, Reel3Strip, Reel4Strip };
@@ -32,7 +33,7 @@ namespace Application.Implementations
             var slot = await slotStore.Get();
             slot.LastStop = reelsLastStop.Select(_ => _.lastStop).ToArray();
 
-            var (totalPayout, prizes) = Calculate(grid, bet);
+            var (prizes, totalPayout) = GetPrizesAndPayout(grid, bet);
 
             await walletService.Credit(playerId, totalPayout);
 
@@ -47,12 +48,40 @@ namespace Application.Implementations
             return await Task.FromResult(response);
         }
 
-        public static (int total, List<Prize> prizes) Calculate(Symbol[][] grid, int bet)
+        /// <summary>
+        /// Return Prizes and Payout
+        /// </summary>
+        public (List<Prize> prizes, int total) GetPrizesAndPayout(Symbol[][] grid, int bet)
         {
-            int total = 0;
+            int totalPayout = 0;
             var prizes = new List<Prize>();
 
-            return (total, prizes);
+            var paylineIndex = 0;
+            foreach (var line in Lines)
+            {
+                var payline = GetPayline(line, grid, paylineIndex);
+                
+                Symbol firstSymbolToMatch = payline[0];
+                logger.LogInformation("Checking first Symbol: {symbol} from Payline {paylineIndex} to match..", firstSymbolToMatch, paylineIndex);
+          
+                paylineIndex++;
+            }
+
+            return (prizes, totalPayout);
+        }
+
+        /// <summary>
+        /// Returns symbols according to the defined paylines
+        /// </summary>
+        private Symbol[] GetPayline(Line line, Symbol[][] grid, int payline) 
+        {
+            var symbols = line.GridPositions
+                          .Select(p => grid[p.Reel][p.Row])
+                          .ToArray();
+
+            logger.LogInformation("[PayLine {payline}-9]: {symbols[0]}, {symbols[1]}, {symbols[2]}, {symbols[3]}, {symbols[4]}", payline, symbols[0], symbols[1], symbols[2], symbols[3], symbols[4]);
+            return symbols;
+
         }
 
         /// <summary>

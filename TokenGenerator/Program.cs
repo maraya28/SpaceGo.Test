@@ -1,6 +1,4 @@
-﻿
-Console.ForegroundColor = ConsoleColor.Green;
-
+﻿Console.ForegroundColor = ConsoleColor.Green;
 Console.WriteLine("------------");
 Console.WriteLine("JWT Token:");
 Console.WriteLine("------------");
@@ -10,5 +8,3 @@ Console.ForegroundColor = ConsoleColor.White;
 var jwt = TokenGenerator.TokenGenerator.Create();
 Console.WriteLine(jwt);
 Console.ReadLine();
-
-

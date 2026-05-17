@@ -4,7 +4,6 @@ namespace Application.Implementations
 {
     public class WalletService(IWalletStore repository) : IWallet
     {
-                 
         public async Task<long> Credit(string playerId, long amount)
         {
             var wallet = await repository.GetWallet(playerId);

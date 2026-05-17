@@ -11,10 +11,9 @@ namespace Application.Implementations
     {
         public async Task<BetResponse> Spin(string playerId, int bet)
         {
-            var balance = await walletService.GetBalance(playerId);
-
             ValidateBet(bet);
 
+            var balance = await walletService.GetBalance(playerId);
             ValidateBalance(bet, balance);
 
             logger.LogInformation("Spin starting..");
@@ -32,17 +31,15 @@ namespace Application.Implementations
             }
 
             Symbol[][] grid = reelsLastStop.Select(_ => _.symbols).ToArray();
-
-            var slot = await slotStore.Get();
-            slot.LastStop = reelsLastStop.Select(_ => _.lastStop).ToArray();
-
             var (prizes, totalPayout) = GetPrizesAndTotalPayout(grid, bet);
 
             balance = await walletService.Credit(playerId, totalPayout);
 
+            var slot = await slotStore.Get();
+            slot.LastStop = reelsLastStop.Select(_ => _.lastStop).ToArray();
             await slotStore.Set(slot);
 
-            logger.LogInformation("Spin stoping.");
+            logger.LogInformation("Spin stoping..");
             logger.LogInformation("playerId={playerId} totalPayout={totalPayout} currentBalance={balance}", playerId, totalPayout, balance);
 
             var response = new BetResponse()
@@ -51,7 +48,7 @@ namespace Application.Implementations
                 Prizes = prizes.ToArray(),
                 TotalPayout = totalPayout,
             };
-            return await Task.FromResult(response);
+            return response;
         }
 
         /// <summary>
@@ -66,12 +63,12 @@ namespace Application.Implementations
             foreach (var line in Lines)
             {
                 var payline = GetPayline(line, grid, paylineIndex);
-                var (symbol, matches) = GetMatchesPerPayline(payline, paylineIndex);
+                var (symbol, matches) = GetMatchesPerPayline(payline);
                 var multiplier = GetMultiplier(symbol, matches);
                 var hasWinningLine = multiplier > 0;
                 if (hasWinningLine)
                 {
-                    (Prize prize, int payout) = GetPrizeAndPayout(line, matches, bet, multiplier);
+                    (Prize prize, int payout) = GetPrizeAndPayout(line, matches, bet, multiplier, paylineIndex);
                     prizes.Add(prize);
                     totalPayout += payout;
                 }
@@ -86,10 +83,11 @@ namespace Application.Implementations
         /// Returns Prize and Payout per winning Line
         /// </summary>
 
-        private (Prize prize, int payout) GetPrizeAndPayout(Line line, int matches, int bet, int multiplier)
+        private (Prize prize, int payout) GetPrizeAndPayout(Line line, int matches, int bet, int multiplier, int payline)
         {
             var payout = bet * multiplier;
             var prize = new Prize(line, matches, payout);
+            logger.LogInformation("winning payline={payline}-9 payout={payout}", payline, payout);
             return (prize, payout);
         }
 
@@ -106,7 +104,7 @@ namespace Application.Implementations
         /// <summary>
         /// Returns first symbol consecutives matches per payline
         /// </summary>
-        private (Symbol symbol, int matchs) GetMatchesPerPayline(Symbol[] payline, int paylineIndex)
+        private (Symbol symbol, int matchs) GetMatchesPerPayline(Symbol[] payline)
         {
             Symbol symbolToMatch = payline[0];
             var matches = 0;
@@ -130,7 +128,7 @@ namespace Application.Implementations
                           .Select(p => grid[p.Reel][p.Row])
                           .ToArray();
 
-            logger.LogInformation("payLine={payline}-9 [{symbols[0]}, {symbols[1]}, {symbols[2]}, {symbols[3]}, {symbols[4]}]", payline, symbols[0], symbols[1], symbols[2], symbols[3], symbols[4]);
+            logger.LogInformation("payline={payline}-9 [{symbols[0]}, {symbols[1]}, {symbols[2]}, {symbols[3]}, {symbols[4]}]", payline, symbols[0], symbols[1], symbols[2], symbols[3], symbols[4]);
             return symbols;
 
         }

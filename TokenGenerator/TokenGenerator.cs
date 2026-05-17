@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Application;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,7 +10,7 @@ namespace TokenGenerator
     {
         public static string Create()
         {
-            var secretKey = "THIS_IS_MY_SUPER_SECRET_KEY_12345";
+            var secretKey = "THIS_IS_A_SECRET_KEY_9876543210_ABCD";
             var key = Encoding.UTF8.GetBytes(secretKey);
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -17,7 +18,7 @@ namespace TokenGenerator
             {
                 Subject = new ClaimsIdentity(new[]
     {
-                    new Claim("playerId", "9003"),
+                    new Claim(Properties.PlayerId, "9003"),
                     new Claim("name", "John Doe"),
                     new Claim("role", "admin"),
                 }),

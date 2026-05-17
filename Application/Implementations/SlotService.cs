@@ -87,7 +87,7 @@ namespace Application.Implementations
         {
             var payout = bet * multiplier;
             var prize = new Prize(line, matches, payout);
-            logger.LogInformation("winning payline={payline}-9 payout={payout}", payline, payout);
+            logger.LogInformation("winner payline={payline}-9 payout={payout}", payline, payout);
             return (prize, payout);
         }
 

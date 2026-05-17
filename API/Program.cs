@@ -15,20 +15,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddExceptionsSetup();
 
 var settings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 builder.Services.AddAuthorizationSetup(settings!);
+builder.Services.AddAuthorization();
 
 builder.Services.AddAplicationSetup();
 builder.Services.AddInfrastructureSetup();
 
-builder.Services.AddAuthorization();
-
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
+builder.Logging.AddLoggingSetup();
 
 var app = builder.Build();
 

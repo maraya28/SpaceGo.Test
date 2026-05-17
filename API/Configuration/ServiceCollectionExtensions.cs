@@ -21,5 +21,12 @@ namespace API
                 });
             return services;
         }
+
+        public static IServiceCollection AddExceptionsSetup(this IServiceCollection services)
+        {
+            services.AddProblemDetails();
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            return services;
+        }
     }
 }

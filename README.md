@@ -3,7 +3,7 @@
 #### Description
 
 - ASP .NET Core Web API version 10
-- Entity Framework InMemory Database
+- Entity Framework Core In-Memory Database
 
 #### Specifications
 

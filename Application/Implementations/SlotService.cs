@@ -158,7 +158,7 @@ namespace Application.Implementations
         {
             if (!AvailableBets.Contains(bet))
             {
-                throw new ApplicationException("The selected bet is not avaibled. The available bets are: 1, 2, 5, 10, 15, 20, 50.");
+                throw new ApplicationException("The selected bet is not avaibled. The available bets are: 1, 2, 5, 10, 15, 20 or 50.");
             }
         }
 
